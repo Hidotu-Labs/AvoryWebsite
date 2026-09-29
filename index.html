@@ -1,265 +1,318 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="AvoryOS — a 64-bit open source hobby operating system for x86_64, written in C and Assembly." />
-<title>AvoryOS — A 64-bit Open Source Hobby Operating System</title>
-<link rel="stylesheet" type="text/css" href="styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AvoryOS — An open source, 64-bit monolithic operating system kernel for x86_64 written in C and Assembly." />
+  <title>AvoryOS — 64-bit Operating System</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<div id="top-bar">
-  <div id="top-bar-inner">
-    <p id="site-title"><a href="/">AvoryOS</a></p>
-    <ul id="nav">
-      <li><a href="#about">About</a></li>
-      <li><a href="#screenshots">Screenshots</a></li>
-      <li><a href="#kernel">Kernel</a></li>
-      <li><a href="#building">Building</a></li>
-      <li><a href="https://github.com/Hidotu-Labs/AvoryOS" target="_blank" rel="noopener">GitHub</a></li>
-    </ul>
-    <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">&#9790;</button>
-  </div>
-</div>
-
-<div id="wrapper">
-  <div id="home">
-
-    <div class="first-column">
-
-      <h2 id="about">What is AvoryOS?</h2>
-      <p>
-        AvoryOS is a hobby operating system kernel for the x86_64 architecture,
-        written in C and Assembly. The goal is to eventually make this a
-        daily-drivable operating system &mdash; built entirely for fun and learning.
-      </p>
-      <p>
-        The kernel boots via <strong>Limine</strong> and supports both 4-level
-        and 5-level x86_64 paging. It runs on real hardware and inside QEMU.
-      </p>
-      <p>
-        <a href="https://github.com/Hidotu-Labs/AvoryOS">AvoryOS on GitHub &rarr;</a>
-      </p>
-
-      <h2 id="screenshots">Screenshots</h2>
-      <p>AvoryOS running in QEMU:</p>
-      <div id="thumbs">
-        <p>
-          <a href="assets/showcase.png">
-            <img src="assets/showcase.png" alt="AvoryOS boot screen" />
-          </a>
-          <small>Wayland</small>
-        </p>
-        <p>
-          <a href="assets/showcase2.png">
-            <img src="assets/showcase2.png" alt="AvoryOS shell session" />
-          </a>
-          <small>X11</small>
-        </p>
+  <!-- Top Header Navigation -->
+  <div id="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <a href="/" class="brand-link">
+          <img src="assets/logo.png" alt="AvoryOS" class="brand-logo" />
+          <span class="brand-name">AvoryOS</span>
+        </a>
       </div>
 
-      <h2 id="kernel">Kernel (Ascension)</h2>
-      <p>
-        The kernel entry point is <code>kmain()</code>, which initialises
-        hardware in stages before handing off to a scheduler-managed init thread.
-      </p>
+      <nav id="nav">
+        <a href="#about">About</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#features">Features</a>
+        <a href="#hardware">Drivers &amp; Hardware</a>
+        <a href="#userland">Userland</a>
+        <a href="#building">Building</a>
+        <a href="https://github.com/Hidotu-Labs/AvoryOS" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
 
-      <h3>Boot &amp; Memory</h3>
-      <ul>
-        <li>Limine bootloader protocol (base revision 0)</li>
-        <li>4-level and 5-level x86_64 paging (detected at boot)</li>
-        <li>Physical Memory Manager (PMM) with HHDM support</li>
-        <li>Virtual Memory Manager (VMM)</li>
-        <li>Slab allocator and kernel heap</li>
-        <li>VMA subsystem with VMA cache</li>
-        <li>DMA allocator with SB16 DMA reservation</li>
-        <li>Shared memory</li>
-        <li>TLB shootdown for SMP coherency</li>
-        <li>Bootloader memory reclaim after mount</li>
-      </ul>
+      <button id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">◐</button>
+    </div>
+  </div>
 
-      <h3>CPU &amp; Interrupts</h3>
-      <ul>
-        <li>GDT, IDT, ISR, and exception handling</li>
-        <li>Syscall interface</li>
-        <li>Legacy 8259 PIC with remap; transitions to APIC when detected</li>
-        <li>Local APIC (LAPIC) and I/O APIC initialisation from ACPI tables</li>
-        <li>LAPIC timer, PIT (100&nbsp;Hz), HPET, RTC</li>
-        <li>TSC calibration</li>
-        <li>CPU feature detection</li>
-        <li>Symmetric Multiprocessing (SMP) &mdash; APs brought online after APIC init</li>
-      </ul>
+  <!-- Page Layout Wrapper -->
+  <div id="wrapper">
 
-      <h3>Filesystem</h3>
-      <ul>
-        <li>Virtual Filesystem (VFS) with slab-cached nodes</li>
-        <li>EXT2, EXT3, EXT4 &mdash; root mount tries EXT4 then EXT2</li>
-        <li>FAT32</li>
-        <li>RamFS (mounted at <code>/dev</code>, <code>/tmp</code>, <code>/run</code>)</li>
-        <li>ProcFS (<code>/proc</code>)</li>
-        <li>SysFS with PCI and network population</li>
-        <li>DevFS</li>
-        <li>VFS page cache and pre-caching of hot shared libraries (<code>precache_hot_files</code>)</li>
-        <li>Ramdisk support (embedded <code>disk.img</code> via Limine modules)</li>
-      </ul>
+    <!-- Main Content Column -->
+    <main class="main-column">
 
-      <h3>Networking</h3>
-      <ul>
-        <li>Network core with dedicated worker thread</li>
-        <li>IPv4 and IPv6</li>
-        <li>TCP and UDP stacks</li>
-        <li>DHCP client</li>
-        <li>Raw ICMP</li>
-        <li>BSD socket API</li>
-        <li>RTL8139 NIC driver</li>
-        <li>SysFS network population</li>
-      </ul>
+      <section id="about">
+        <h1>AvoryOS</h1>
+        <p class="tagline">An open-source monolithic hobby operating system kernel for the <code>x86_64</code> architecture.</p>
 
-      <h3>Drivers</h3>
-      <ul>
-        <li><strong>Storage:</strong> AHCI (SATA), ATA/IDE, block device layer, ramdisk</li>
-        <li><strong>GPU:</strong> Framebuffer (GOP), DRM subsystem, VirtIO-GPU</li>
-        <li><strong>Audio:</strong> SB16, AC&rsquo;97, Intel HDA, audio DSP layer</li>
-        <li><strong>USB:</strong> EHCI, OHCI, UHCI, xHCI host controllers; USB keyboard and mouse</li>
-        <li><strong>Input:</strong> PS/2 keyboard, PS/2 mouse, evdev layer</li>
-        <li><strong>Timers:</strong> PIT, HPET, RTC, LAPIC timer</li>
-        <li><strong>Bus:</strong> PCI enumeration</li>
-        <li><strong>Virtualisation:</strong> VirtIO subsystem</li>
-        <li><strong>Serial:</strong> Serial port + PTY</li>
-      </ul>
+        <p>
+          AvoryOS is built from scratch in C and Assembly. It features a Linux-compatible system call interface,
+          POSIX userland compatibility, dual musl and glibc runtimes, native in-kernel IPv4 &amp; IPv6 networking,
+          and a LinuxKPI compatibility layer for upstream graphics drivers.
+        </p>
 
-      <h3>Process &amp; Scheduling</h3>
-      <ul>
-        <li>Preemptive scheduler</li>
-        <li>Kernel threads; init thread manages userspace session</li>
-        <li>Process execution</li>
-        <li>AvoryD as primary userspace session, Bash as fallback</li>
-      </ul>
+        <p>
+          The system boots using the <strong>Limine</strong> bootloader protocol (UEFI &amp; BIOS),
+          supports both 4-level and 5-level paging, and runs desktop environments including
+          KDE Plasma 6, XFCE4, and IceWM inside QEMU and on real hardware.
+        </p>
 
-      <h3>Other</h3>
-      <ul>
-        <li>ACPI (RSDP, FADT, LAPIC/IOAPIC base detection)</li>
-        <li>HAL abstraction layer</li>
-        <li>Device manager with DTB support</li>
-        <li>User-space driver framework</li>
-        <li>LinuxKPI compatibility layer</li>
-        <li>Radix tree library</li>
-        <li>Kernel logging with colour output</li>
-        <li>Console with screen logging toggle</li>
-        <li><code>/dev/random</code>, <code>/dev/fb*</code>, <code>/dev/dri/*</code>, <code>/dev/mouse</code>, <code>/dev/audio*</code> VFS nodes</li>
-      </ul>
+        <div class="quick-links">
+          <a href="https://github.com/Hidotu-Labs/AvoryOS" class="link-btn primary" target="_blank" rel="noopener">GitHub Repository</a>
+          <a href="https://github.com/Hidotu-Labs/AvoryOS/tree/Rewrite" class="link-btn" target="_blank" rel="noopener">Rewrite Branch</a>
+          <a href="#building" class="link-btn">Build Instructions</a>
+        </div>
+      </section>
 
-      <h2 id="building">Building from source</h2>
-      <p>Requires Linux. Install dependencies:</p>
-      <pre>sudo apt install make gcc nasm git curl xorriso \
-    qemu-system-x86_64 e2fsprogs rustc cargo</pre>
+      <hr />
 
-      <p>Clone and build:</p>
-      <pre>git clone https://github.com/Hidotu-Labs/AvoryOS.git
+      <section id="screenshots">
+        <h2>Screenshots</h2>
+        <p>Captures from recent builds running in QEMU with KVM acceleration:</p>
+
+        <div class="screenshot-gallery">
+          
+          <figure class="screenshot-item">
+            <a href="assets/showcase.png" target="_blank" title="View full image">
+              <img src="assets/showcase.png" alt="AvoryOS running KDE Plasma 6" loading="lazy" />
+            </a>
+            <figcaption>
+              <strong>KDE Plasma 6 on AvoryOS</strong> &mdash; Welcome Center, Konqi mascot, and application menu.
+            </figcaption>
+          </figure>
+
+          <figure class="screenshot-item">
+            <a href="assets/showcase2.png" target="_blank" title="View full image">
+              <img src="assets/showcase2.png" alt="AvoryOS 2.5.0 Beta running XFCE and Minecraft 1.16.5" loading="lazy" />
+            </a>
+            <figcaption>
+              <strong>AvoryOS 2.5.0 Beta</strong> &mdash; XFCE 4.18 desktop running Minecraft Java Edition 1.16.5 via OpenJDK 17 and LWJGL.
+            </figcaption>
+          </figure>
+
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="features">
+        <h2>Kernel Highlights</h2>
+
+        <h3>Core &amp; Memory Subsystem</h3>
+        <ul>
+          <li><strong>Architecture:</strong> 64-bit higher-half kernel booted via the Limine protocol.</li>
+          <li><strong>PMM:</strong> Physical Memory Manager with per-CPU page caches and NUMA/node awareness.</li>
+          <li><strong>VMM:</strong> Virtual Memory Manager with 4-level paging, PCID hardware tagging, hugepages, copy-on-write (COW), demand paging, and batched TLB shootdowns.</li>
+          <li><strong>Scheduler:</strong> Preemptive SMP scheduler with multi-core APIC/IPI support, POSIX threads, futexes (with priority inheritance), and signals.</li>
+          <li><strong>Syscall Engine:</strong> Fast syscall handling (<code>syscall</code>/<code>sysret</code>), user access optimizations (<code>fast_copy_user</code>), and vDSO page.</li>
+        </ul>
+
+        <h3>Virtual Filesystem (VFS)</h3>
+        <ul>
+          <li>VFS with page cache and dentry cache.</li>
+          <li><strong>EXT4 &amp; EXT2:</strong> Native read/write support.</li>
+          <li><strong>FAT32:</strong> Support for EFI partitions and USB storage.</li>
+          <li><strong>Pseudo-filesystems:</strong> RamFS, TmpFS, DevTmpFS, ProcFS (<code>/proc</code>), and SysFS (<code>/sys</code>).</li>
+        </ul>
+
+        <h3>Networking (IPv4 &amp; IPv6)</h3>
+        <ul>
+          <li>In-kernel network core with a dedicated asynchronous worker thread.</li>
+          <li>Dual-stack <strong>IPv4 and IPv6</strong> support with Neighbor Discovery (NDP), ICMPv6, and SLAAC autoconfiguration.</li>
+          <li>BSD socket API layer (<code>AF_INET</code> and <code>AF_INET6</code> UDP/TCP sockets).</li>
+          <li>Realtek RTL8139 NIC driver with SysFS device registration.</li>
+        </ul>
+      </section>
+
+      <hr />
+
+      <section id="hardware">
+        <h2>Hardware &amp; Driver Support</h2>
+
+        <h3>Storage &amp; Partitioning</h3>
+        <ul>
+          <li><strong>NVMe:</strong> PCIe Gen3/Gen4/Gen5 driver with namespace discovery and command queueing.</li>
+          <li><strong>GPT:</strong> Full GUID Partition Table partitioning support alongside legacy MBR.</li>
+          <li><strong>SATA / IDE:</strong> AHCI (SATA) and legacy IDE/ATA controllers.</li>
+          <li><strong>Ramdisk:</strong> Limine module embedded ramdisk boot.</li>
+        </ul>
+
+        <h3>Graphics &amp; LinuxKPI</h3>
+        <ul>
+          <li><strong>Native ascentdrm:</strong> Framebuffer and VirtIO-GPU DRM backend with hardware cursor management.</li>
+          <li><strong>LinuxKPI Subsystem:</strong> Compatibility layer designed to run unmodified upstream Linux kernel drivers (PCIe VFIO passthrough, DRM/TTM/dma-buf).</li>
+          <li><strong>AMDGPU:</strong> Hardware bring-up and mode-setting pipeline (experimental/WIP).</li>
+          <li><strong>Mesa Acceleration:</strong> llvmpipe / pixman software rasterizers and Gallium drivers.</li>
+        </ul>
+
+        <h3>Audio &amp; Input</h3>
+        <ul>
+          <li><strong>Audio:</strong> Intel High Definition Audio (HDA), AC'97, and Sound Blaster 16 (<code>/dev/dsp</code>).</li>
+          <li><strong>Evdev Layer:</strong> Unified input subsystem for PS/2 keyboards/mice and USB HID devices.</li>
+          <li><strong>USB Controllers:</strong> xHCI, EHCI, OHCI, and UHCI.</li>
+        </ul>
+      </section>
+
+      <hr />
+
+      <section id="userland">
+        <h2>Userland Ecosystem</h2>
+
+        <p>AvoryOS combines custom software with standard Linux userland packages through Alpine Linux integration and dual C runtimes:</p>
+
+        <div class="userland-table-wrapper">
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Software &amp; Packages</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Toolchains</strong></td>
+                <td>GCC, G++, GNU Binutils, Make, Tiny C Compiler (TCC), musl libc, GNU glibc</td>
+              </tr>
+              <tr>
+                <td><strong>Desktops</strong></td>
+                <td>KDE Plasma 6, XFCE 4.18, IceWM, AetherDE (AetherWM, Dock &amp; Panel), Weston (Wayland), Xorg Server</td>
+              </tr>
+              <tr>
+                <td><strong>Games</strong></td>
+                <td>Minecraft Java Edition 1.16.5 (OpenJDK 17 + LWJGL), Mocktail (Roblox), Yamagi Quake II, DOOM, ClassiCube, Butterscotch</td>
+              </tr>
+              <tr>
+                <td><strong>Applications</strong></td>
+                <td>Mozilla Firefox, VLC media player, GNU Coreutils, Bash 5.3, cmus, fastfetch, kilo editor, Kria</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <hr />
+
+      <section id="building">
+        <h2>Building from Source</h2>
+        <p>Building requires a 64-bit Linux host (Ubuntu/Debian, Arch, Fedora, etc.).</p>
+
+        <h3>1. Install Dependencies</h3>
+        <pre><code>sudo apt install make gcc nasm git curl xorriso \
+    qemu-system-x86_64 e2fsprogs bison flex util-linux parted</code></pre>
+
+        <h3>2. Clone &amp; Bootstrap</h3>
+        <pre><code>git clone -b Rewrite https://github.com/Hidotu-Labs/AvoryOS.git
 cd AvoryOS
-make</pre>
+./bootstrap.sh</code></pre>
 
-      <p>Run in QEMU:</p>
-      <pre>make run</pre>
+        <h3>3. Setup Alpine Userland</h3>
+        <pre><code>./scripts/setup-alpine.sh</code></pre>
 
-      <h3>Ported userland</h3>
-      <p>Build the full suite of ported tools in order:</p>
-      <pre>./scripts/build-bash.sh      &amp;&amp; \
-./scripts/build-coreutils.sh &amp;&amp; \
-./scripts/build-tcc.sh       &amp;&amp; \
-./scripts/setup-alpine.sh    &amp;&amp; \
-./scripts/build-tinygl.sh</pre>
+        <h3>4. Compile Kernel &amp; Disk Image</h3>
+        <pre><code>make</code></pre>
 
-      <p>
-        <code>make</code> prepares the musl cross-toolchain, compiles the
-        kernel, and generates a bootable ISO automatically.
-      </p>
+        <h3>5. Run in QEMU</h3>
+        <p>Launch with KVM acceleration, NVMe root disk, and VirtIO graphics:</p>
+        <pre><code>make run</code></pre>
+        <p>Or run with software TCG emulation if KVM is unavailable:</p>
+        <pre><code>make run-tcg</code></pre>
+      </section>
 
-    </div>
+    </main>
 
-    <div class="second-column">
+    <!-- Sidebar Column -->
+    <aside class="sidebar">
 
-      <div class="emph-box">
+      <div class="box">
         <h3>Project</h3>
-        <ul>
-          <li><a href="https://github.com/Hidotu-Labs/AvoryOS">Source code</a></li>
-          <li><a href="https://github.com/Hidotu-Labs/AvoryOS/issues">Issue tracker</a></li>
+        <ul class="clean-list">
+          <li><a href="https://github.com/Hidotu-Labs/AvoryOS">Source Code (GitHub)</a></li>
+          <li><a href="https://github.com/Hidotu-Labs/AvoryOS/tree/Rewrite">Rewrite Branch</a></li>
           <li><a href="https://github.com/Hidotu-Labs/AvoryOS/releases">Releases</a></li>
-          <li><a href="https://github.com/Hidotu-Labs/AvoryOS/blob/Rewrite/README.md">README</a></li>
+          <li><a href="https://github.com/Hidotu-Labs/AvoryOS/issues">Issue Tracker</a></li>
+          <li><a href="https://github.com/Hidotu-Labs/AvoryOS/blob/Rewrite/SECURITY.md">Security Policy</a></li>
         </ul>
       </div>
 
-      <div class="emph-box">
-        <h3>Bootloader</h3>
-        <ul>
-          <li>Limine (protocol v0)</li>
-          <li>BIOS &amp; UEFI</li>
+      <div class="box">
+        <h3>Quick Specs</h3>
+        <table class="specs-mini">
+          <tr>
+            <td>Target</td>
+            <td><code>x86_64</code></td>
+          </tr>
+          <tr>
+            <td>Kernel</td>
+            <td>Monolithic (Higher-half)</td>
+          </tr>
+          <tr>
+            <td>Boot</td>
+            <td>Limine (BIOS &amp; UEFI)</td>
+          </tr>
+          <tr>
+            <td>Languages</td>
+            <td>C, Assembly</td>
+          </tr>
+          <tr>
+            <td>Filesystems</td>
+            <td>EXT4, EXT2, FAT32</td>
+          </tr>
+          <tr>
+            <td>Network</td>
+            <td>Dual IPv4 / IPv6</td>
+          </tr>
+          <tr>
+            <td>License</td>
+            <td>GPL v3</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="box">
+        <h3>Artwork</h3>
+        <a href="assets/room.png" target="_blank" class="art-link">
+          <img src="assets/room.png" alt="Ascent Rise Above emblem" class="sidebar-thumb" />
+        </a>
+        <p class="sidebar-caption">Ascent &mdash; Official project emblem &amp; wallpaper.</p>
+      </div>
+
+      <div class="box">
+        <h3>Repository Branches</h3>
+        <ul class="clean-list">
+          <li><strong>Rewrite</strong> (Active development)</li>
+          <li><strong>main</strong> (Stable snapshot)</li>
         </ul>
       </div>
 
-      <div class="emph-box">
-        <h3>Filesystems</h3>
-        <ul>
-          <li>EXT2 / EXT3 / EXT4</li>
-          <li>FAT32</li>
-          <li>RamFS, DevFS</li>
-          <li>ProcFS, SysFS</li>
-        </ul>
-      </div>
-
-      <div class="emph-box">
-        <h3>Written in</h3>
-        <ul>
-          <li>C</li>
-          <li>Assembly (x86_64)</li>
-          <li>Rust (toolchain)</li>
-        </ul>
-      </div>
-
-      <div class="emph-box">
-        <h3>Ported software</h3>
-        <ul>
-          <li>Bash</li>
-          <li>GNU Coreutils</li>
-          <li>kilo (text editor)</li>
-          <li>TCC</li>
-          <li>X11 / TinyGL</li>
-          <li>Alpine userland</li>
-          <li>GTK3 &amp; GTK4</li>
-          <li>Qt5 &amp; Qt6</li>
-          <li>WebKitGTK</li>
-          <li>VLC</li>
-          <li>ClassiCube</li>
-          <li>Quake 2</li>
-        </ul>
-      </div>
-
-    </div>
+    </aside>
 
   </div>
-</div>
 
-<div id="footer">
-  <p>
-    AvoryOS &mdash; open source hobby OS. &nbsp;|&nbsp;
-    <a href="https://github.com/Hidotu-Labs/AvoryOS">GitHub</a>
-  </p>
-</div>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <p>AvoryOS is an open-source hobby operating system kernel.</p>
+      <p>
+        <a href="https://github.com/Hidotu-Labs/AvoryOS">GitHub</a> &bull;
+        <a href="https://github.com/Hidotu-Labs/AvoryOS/blob/Rewrite/LICENSE">GPL v3 License</a> &bull;
+        <a href="#top-bar">Back to top ↑</a>
+      </p>
+    </div>
+  </footer>
 
-<script>
-  (function() {
-    var btn = document.getElementById('theme-toggle');
-    var stored = localStorage.getItem('avory-theme');
-    if (stored === 'dark') document.body.classList.add('dark');
+  <script>
+    (function() {
+      var btn = document.getElementById('theme-toggle');
+      var stored = localStorage.getItem('avory_theme');
+      if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark');
+      }
 
-    btn.addEventListener('click', function() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('avory-theme',
-        document.body.classList.contains('dark') ? 'dark' : 'light');
-    });
-  })();
-</script>
+      btn.addEventListener('click', function() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('avory_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+      });
+    })();
+  </script>
 
 </body>
 </html>
+
